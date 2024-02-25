@@ -11,13 +11,13 @@ COPY ./ .
 
 RUN echo "-------------------- start install --------------------"
 # # 设置淘宝npm镜像
-RUN npm install -g cnpm --registry=https://registry.npmmirror.com
+#RUN npm install -g cnpm --registry=https://registry.npmmirror.com
 # # 安装依赖
 RUN npm install
 
-# RUN echo "-------------------- end install --------------------"
+RUN echo "-------------------- end install --------------------"
 
-# RUN echo "-------------------- build start  --------------------"
+RUN echo "-------------------- build start  --------------------"
 
 # # 打包 - 目的：丢到nginx下跑
 RUN vite build
