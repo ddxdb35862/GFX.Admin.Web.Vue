@@ -1,5 +1,5 @@
 # node镜像
-FROM node:latest as build-stage
+FROM node:20.10.0-alpine as build-stage
 RUN echo "-------------------- start build --------------------"
 
 RUN echo "-------------------- web environment configuration --------------------"
@@ -11,16 +11,19 @@ COPY ./ .
 
 RUN echo "-------------------- start install --------------------"
 # # 设置淘宝npm镜像
-#RUN npm install -g cnpm --registry=https://registry.npmmirror.com
+RUN npm install -g cnpm --registry=https://registry.npmmirror.com
+
+# 设置新的镜像地址
+# RUN pnpm set registry https://registry.npmmirror.com
 # # 安装依赖
-RUN npm install
+RUN cnpm install
 
 RUN echo "-------------------- end install --------------------"
 
 RUN echo "-------------------- build start  --------------------"
 
 # # 打包 - 目的：丢到nginx下跑
-RUN vite build
+RUN cnpm run build
 
 RUN echo "-------------------- build end  --------------------"
 
@@ -33,9 +36,9 @@ FROM nginx:1.20.2
 EXPOSE 80 443
 RUN rm /etc/nginx/conf.d/default.conf
 
-COPY /build/*.conf /etc/nginx/conf.d/
+COPY ./build/*.conf /etc/nginx/conf.d/
 
-COPY /build/dist /usr/share/nginx/html/
+COPY ./build/dist /usr/share/nginx/html/
 
 # 使用daemon off的方式将nginx运行在前台保证镜像不至于退出
 CMD ["nginx", "-g", "daemon off;"]
