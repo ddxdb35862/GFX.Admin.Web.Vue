@@ -74,7 +74,7 @@ const submit = () => {
 					if (rsp.data.code == 200) {
 						ElMessage.success('修改文件信息成功！');
 					} else {
-						Elmessage.error('修改文件信息失败：' + rsp.data.message);
+            ElMessage.error('修改文件信息失败：' + rsp.data.message);
 					}
 				});
 		}
