@@ -334,7 +334,7 @@ defineExpose({ hiprintTemplate });
 // 默认图片
 :deep(.hiprint-printElement-image-content) {
 	img {
-		content: url('~@/assets/logo.png');
+		content: url('/@/assets/logo.png');
 	}
 }
 
