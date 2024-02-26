@@ -1,3 +1,7 @@
-**/node_modules
+node_modules
 **/.idea
-/build/dist
+#/build/dist
+.gitignore
+README.md
+CHANGELOG.md
+LICENSE
