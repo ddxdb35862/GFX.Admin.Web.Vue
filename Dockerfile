@@ -14,7 +14,7 @@ COPY . .
 RUN echo "-------------------- start install --------------------"
 
 # 设置淘宝npm镜像
-RUN npm config set registry https://registry.npmmirror.com
+# RUN npm config set registry https://registry.npmmirror.com
 
 # 设置腾讯镜像地址
 # RUN cnpm set registry https://mirrors.cloud.tencent.com/npm
