@@ -18,7 +18,38 @@ cnpm run dev
 ```
 
 
+# Dockerfile
 
+> 当你在Docker中一键构建镜像的时候注意啦!!!
+> 当你在Docker中一键构建镜像的时候注意啦!!!
+> 当你在Docker中一键构建镜像的时候注意啦!!!
+
+##  将你的Docker的内存和交换内容拉满。不然会在`npm run build` 的时候报内存不足.(3天时间找到的解决方案。头都麻了)
+
+### Windows
+1. Windows 下调出 win+r，输入`%UserProfile%`
+2. 找到`.wslconfig` 这个文件。记得前面有个点.还有可能是隐藏的。没有就创建一个
+>  参数说明：
+>> memory: 表示可以使用的最大内存；
+
+>> processors: 使用的核心数量，默认和你的 Windows 系统使用的核心数一样；
+
+>> swap: 表示可以使用的swap大小，这里设置为不使用swap分区；
+
+>> localhostForwarding: 默认值为 true。如果 WSL 2 VM 中绑定到通配符或 localhost 的端口应该可以通过 localhost:port 从主机连接
+
+3. 将其中的 `memory=20GB`  这个20GB。拉满到你的实际内存
+4. 将其中的 `swap=12GB` 这个12GB。你弄大一点。我这个12G就可以了（我C盘拉满了。没空间啦）
+5. 然后保存
+6. 配置完成后，配置无法立马生效，这里想到可以将WSL重启一下
+7. 先`退出` Docker Desktop。
+8. win+r 调出运行：输入`cmd`. 
+9. 然后在黑框框或蓝框框中输入 `wsl --shutdown`
+10. 启动 Docker Desktop
+11. 好了。你可以开始执行项目的`Dockerfile` 了
+
+# MAC
+1. 和Windows 差不多。就是.wslconfig 的位置不同啦。
 
 # 以下为原内容
 
