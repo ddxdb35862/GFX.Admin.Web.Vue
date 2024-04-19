@@ -12,7 +12,8 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.1.0",
     "@microsoft/signalr": "^8.0.0",
-    "@vue-office/excel": "^1.4.6",
+    "@vue-office/docx": "^1.6.0",
+    "@vue-office/excel": "^1.6.0",
     "@vue-office/pdf": "^1.5.5",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^5.1.12",
