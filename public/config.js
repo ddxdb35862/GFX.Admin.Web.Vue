@@ -3,5 +3,5 @@ window.__env__ = {
   "VITE_OPEN": "false",
   "VITE_OPEN_CDN": "false",
   "VITE_PUBLIC_PATH": "",
-  "VITE_API_URL": "http://gameframex.alianblank.com:20802"
+  "VITE_API_URL": "http://localhost:20802"
 } 
