@@ -1,5 +1,6 @@
 ﻿<template>
   <div class="gameFormationBase-container">
+    <my-dialog @data-updated="handleDataUpdated" />
     <el-card shadow="hover" :body-style="{ paddingBottom: '0' }">
       <el-form :model="queryParams" ref="queryForm" labelWidth="90">
         <el-row>
@@ -57,44 +58,33 @@
           style="width: 100%"
           v-loading="loading"
           tooltip-effect="light"
-          row-key="id"
-          border="">
-        <el-table-column type="index" label="序号" width="55" align="center"/>
-        <el-table-column prop="id" label="Id" width="240" show-overflow-tooltip=""/>
+          row-key="s_Id">
+        <el-table-column type="index" label="序号" width="55"/>
+        <el-table-column prop="s_Id" label="Id" width="240" show-overflow-tooltip=""/>
         <el-table-column prop="roundId" label="轮次" width="80" show-overflow-tooltip=""/>
         <el-table-column prop="playerRank" label="玩家等级" width="120" show-overflow-tooltip=""/>
         <el-table-column prop="playerCareerConfigId" label="职业Id" width="100" show-overflow-tooltip=""/>
         <el-table-column prop="playerCareerSkinConfigId" label="皮肤Id" width="100" show-overflow-tooltip=""/>
+        <el-table-column prop="s_UpdateTime" label="更新时间" width="160" show-overflow-tooltip=""/>
         <el-table-column prop="remark" label="备注" width="240" show-overflow-tooltip=""/>
-        <el-table-column label="操作" width="140" align="center" fixed="right" show-overflow-tooltip=""
+        <el-table-column label="操作" width="200" align="center" fixed="right" show-overflow-tooltip=""
                          v-if="auth('gameFormationBase:edit') || auth('gameFormationBase:delete')">
           <template #default="scope">
-            <el-button icon="ele-Edit" size="small" text="" type="primary" @click="openEditClientChannel(scope.row)"
+            <el-button icon="ele-Edit" size="small" text="" type="primary" @click="openEditGameFormation(scope.row)"
                        v-auth="'gameFormationBase:edit'"> 编辑
             </el-button>
-            <el-button icon="ele-Delete" size="small" text="" type="primary" @click="delClientChannel(scope.row)"
+            <el-button icon="ele-Delete" size="small" text="" type="primary" @click="delGameFormation(scope.row)"
                        v-auth="'gameFormationBase:delete'"> 删除
             </el-button>
           </template>
         </el-table-column>
       </el-table>
-      <!-- <el-pagination
-          v-model:currentPage="tableParams.page"
-          v-model:page-size="tableParams.pageSize"
-          :total="tableParams.total"
-          :page-sizes="[10, 20, 50, 100, 200, 500]"
-          small=""
-          background=""
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-          layout="total, sizes, prev, pager, next, jumper"
-      /> -->
       <editDialog
           ref="editDialogRef"
           :title="editClientChannelTitle"
           @reloadTable="handleQuery"
       />
-    </el-card>
+    </el-card>  
   </div>
 </template>
 
@@ -107,6 +97,20 @@ import {getDictDataItem as di, getDictDataList as dl} from '/@/utils/dict-utils'
 
 import editDialog from '/@/views/game/gameFormation/base/component/editDialog.vue'
 import {listGameFormationBase, deleteGameFormationBase, mergeOnlineGameFormationBase} from '/@/api/game/gameFormation/base';
+
+// import { defineStore } from 'pinia';  
+  
+// export const useCounterStore = defineStore('counter', {  
+//   state: () => ({  
+//     count: 0,  
+//   }),  
+//   actions: {  
+//     increment() {  
+//       this.count++;  
+//       console.log(this.count);
+//     },  
+//   },  
+// });
 
 
 const showAdvanceQueryUI = ref(false);
@@ -131,6 +135,7 @@ const changeAdvanceQueryUI = () => {
 const handleQuery = async () => {
   loading.value = true;
   var res = await listGameFormationBase(Object.assign(queryParams.value, tableParams.value));
+  console.log(res.data.result);
   tableData.value = res.data.result == null ? []: res.data.result;
   //tableParams.value.total = tableData.value.count;
   loading.value = false;
@@ -148,19 +153,20 @@ const mergeOnline = async () => {
   loading.value = false;
   if(result)
   {
-  console.log("Merge02");
+    console.log("Merge02");
     await handleQuery();
   }
 };
 
 // 打开编辑页面
-const openEditClientChannel = (row: any) => {
-  editClientChannelTitle.value = '编辑渠道管理';
+const openEditGameFormation = (row: any) => {
+  editClientChannelTitle.value = '编辑阵容';
+  console.log(row)
   editDialogRef.value.openDialog(row);
 };
 
 // 删除
-const delClientChannel = (row: any) => {
+const delGameFormation = (row: any) => {
   ElMessageBox.confirm(`确定要删除吗?`, "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
@@ -168,8 +174,8 @@ const delClientChannel = (row: any) => {
   })
       .then(async () => {
         await deleteGameFormationBase(row);
-        handleQuery();
         ElMessage.success("删除成功");
+        handleQuery();
       })
       .catch(() => {
       });
@@ -188,6 +194,7 @@ const handleCurrentChange = (val: number) => {
 };
 
 handleQuery();
+
 </script>
 <style scoped>
 :deep(.el-ipnut),

@@ -131,6 +131,7 @@ service.interceptors.response.use(
 			throw new Error(message);
 		}
 
+		console.dir(res.data, { depth: null, colors: true })
 		return res;
 	},
 	(error) => {
