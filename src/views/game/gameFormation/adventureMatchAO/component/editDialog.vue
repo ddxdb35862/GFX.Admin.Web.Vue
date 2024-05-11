@@ -1,5 +1,5 @@
 ﻿<template>
-	<div class="gameFormationBase-container">
+	<div class="gameFormationAdventureMatchAO-container">
 		<el-dialog v-model="isShowDialog" draggable="" 
 					v-loading="loading" width="90%">
 			

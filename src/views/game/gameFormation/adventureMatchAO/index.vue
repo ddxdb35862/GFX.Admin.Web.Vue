@@ -1,5 +1,5 @@
 ﻿<template>
-  <div class="gameFormationBase-container">
+  <div class="gameFormationAdventureMatchAO-container">
     <my-dialog @data-updated="handleDataUpdated" />
     <el-card shadow="hover" :body-style="{ paddingBottom: '0' }">
       <el-form :model="queryParams" ref="queryForm" labelWidth="90">
@@ -10,41 +10,29 @@
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" class="mb10">
-            <el-form-item label="玩家等级">
-              <el-input v-model="queryParams.rank" clearable="" placeholder="1,2,3...,25"/>
+            <el-form-item label="模式">
+              <el-input v-model="queryParams.adventureMode" clearable="" placeholder="1,2"/>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" class="mb10">
-            <el-form-item label="职业Id">
-              <el-input v-model="queryParams.careerConfigId" clearable="" placeholder="1,2,3,4"/>
-            </el-form-item>
-          </el-col>
-          <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" class="mb10">
-            <el-form-item label="皮肤Id">
-              <el-input v-model="queryParams.careerSkinConfigId" clearable="" placeholder="101,102..."/>
+            <el-form-item label="闯关次数">
+              <el-input v-model="queryParams.adventureTime" clearable="" placeholder="1,2,3,4"/>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" class="mb10">
             <el-form-item>
               <el-button-group>
-                <el-button type="primary" icon="ele-Search" @click="handleQuery" v-auth="'gameFormationBase:list'">
+                <el-button type="primary" icon="ele-Search" @click="handleQuery" v-auth="'gameFormationAdventureMatchAO:list'">
                   查询
                 </el-button>
               </el-button-group>
             </el-form-item>
           </el-col>
-        </el-row>
-        <el-row>
-          <el-col :xs="24" :sm="12" :md="12" :lg="8" :xl="4" class="mb10">
-            <el-form-item label="同步玩家Id">
-              <el-input v-model="queryParams.toMergePlayerUnitIds" clearable="" placeholder="合并的玩家Id,如果没有输入,则默认合并所有玩家"/>
-            </el-form-item>
-          </el-col>
           <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" class="mb10">
             <el-form-item>
               <el-button-group>
-                <el-button type="primary" icon="ele-Plus" @click="mergeOnline" v-auth="'gameFormationBase:mergeOnline'">
-                  同步线上
+                <el-button type="primary" icon="ele-Plus" @click="addAdventureAO" v-auth="'gameFormationAdventureMatchAO:add'">
+                  添加
                 </el-button>
               </el-button-group>
             </el-form-item>
@@ -62,19 +50,19 @@
         <el-table-column type="index" label="序号" width="55"/>
         <el-table-column prop="s_Id" label="Id" width="240" show-overflow-tooltip=""/>
         <el-table-column prop="roundId" label="轮次" width="80" show-overflow-tooltip=""/>
-        <el-table-column prop="playerRank" label="玩家等级" width="120" show-overflow-tooltip=""/>
-        <el-table-column prop="playerCareerConfigId" label="职业Id" width="100" show-overflow-tooltip=""/>
-        <el-table-column prop="playerCareerSkinConfigId" label="皮肤Id" width="100" show-overflow-tooltip=""/>
+        <el-table-column prop="adventureMode" label="闯关模式" width="120" show-overflow-tooltip=""/>
+        <el-table-column prop="adventureTime" label="闯关次数" width="100" show-overflow-tooltip=""/>
+        <el-table-column prop="formationRemark" label="阵容备注" width="240" show-overflow-tooltip=""/>
         <el-table-column prop="s_UpdateTime" label="更新时间" width="160" show-overflow-tooltip=""/>
         <el-table-column prop="remark" label="备注" width="240" show-overflow-tooltip=""/>
         <el-table-column label="操作" width="200" align="center" fixed="right" show-overflow-tooltip=""
-                         v-if="auth('gameFormationBase:edit') || auth('gameFormationBase:delete')">
+                         v-if="auth('gameFormationAdventureMatchAO:edit') || auth('gameFormationAdventureMatchAO:delete')">
           <template #default="scope">
-            <el-button icon="ele-Edit" size="small" text="" type="primary" @click="openEditGameFormation(scope.row)"
-                       v-auth="'gameFormationBase:edit'"> 编辑
+            <el-button icon="ele-Edit" size="small" text="" type="primary" @click="openEditGameFormationAdventureMatchAO(scope.row)"
+                       v-auth="'gameFormationAdventureMatchAO:edit'"> 编辑
             </el-button>
-            <el-button icon="ele-Delete" size="small" text="" type="primary" @click="delGameFormation(scope.row)"
-                       v-auth="'gameFormationBase:delete'"> 删除
+            <el-button icon="ele-Delete" size="small" text="" type="primary" @click="delGameFormationAdventureMatchAO(scope.row)"
+                       v-auth="'gameFormationAdventureMatchAO:delete'"> 删除
             </el-button>
           </template>
         </el-table-column>
@@ -88,15 +76,15 @@
   </div>
 </template>
 
-<script lang="ts" setup="" name="gameFormationBase">
+<script lang="ts" setup="" name="gameFormationAdventureMatchAO">
 import {ref} from "vue";
 import {ElMessageBox, ElMessage} from "element-plus";
 import {auth} from '/@/utils/authFunction';
 import {getDictDataItem as di, getDictDataList as dl} from '/@/utils/dict-utils';
 //import { formatDate } from '/@/utils/formatTime';
 
-import editDialog from '/@/views/game/gameFormation/base/component/editDialog.vue'
-import {listGameFormationBase, deleteGameFormationBase, mergeOnlineGameFormationBase} from '/@/api/game/gameFormation/base';
+import editDialog from '/@/views/game/gameFormation/adventureMatchAO/component/editDialog.vue'
+import {listGameFormationAdventureMatchAO, deleteGameFormationAdventureMatchAO} from '/@/api/game/gameFormation/adventureMatchAO';
 
 // import { defineStore } from 'pinia';  
   
@@ -117,7 +105,7 @@ const showAdvanceQueryUI = ref(false);
 const editDialogRef = ref();
 const loading = ref(false);
 const tableData = ref<any>([]);
-const queryParams = ref<any>({toMergePlayerUnitIds: '2276326310345244672', roundId:"1", rank:"0"});
+const queryParams = ref<any>({roundId:"1", adventureMode:"0", adventureTime:"1"});
 const tableParams = ref({
   page: 1,
   pageSize: 10,
@@ -134,47 +122,38 @@ const changeAdvanceQueryUI = () => {
 // 查询操作
 const handleQuery = async () => {
   loading.value = true;
-  var res = await listGameFormationBase(Object.assign(queryParams.value, tableParams.value));
+  var res = await listGameFormationAdventureMatchAO(Object.assign(queryParams.value, tableParams.value));
   console.log(res.data.result);
   tableData.value = res.data.result == null ? []: res.data.result;
   //tableParams.value.total = tableData.value.count;
   loading.value = false;
 };
 
-// 同步
-const mergeOnline = async () => {
-  console.log("Merge3");
-  loading.value = true;
-  var res = await mergeOnlineGameFormationBase(Object.assign(queryParams.value, tableParams.value));
-  console.log("Merge01");
-  var result = res.data.result;
-  console.log(queryParams.value,"queryParams");
-  console.log(tableParams.value,"tableParams");
-  loading.value = false;
-  if(result)
-  {
-    console.log("Merge02");
-    await handleQuery();
-  }
-};
-
 // 打开编辑页面
-const openEditGameFormation = (row: any) => {
-  editClientChannelTitle.value = '编辑阵容';
+const openEditGameFormationAdventureMatchAO = (row: any) => {
+  editClientChannelTitle.value = '编辑闯关匹配阵容';
   console.log(row)
   editDialogRef.value.isEditor= true;
   editDialogRef.value.openDialog(row);
 };
 
+// 打开添加页面
+const openAddGameFormationAdventureMatchAO = (row: any) => {
+  editClientChannelTitle.value = '添加闯关匹配阵容';
+  console.log(row)
+  editDialogRef.value.isEditor= false;
+  editDialogRef.value.openDialog(row);
+};
+
 // 删除
-const delGameFormation = (row: any) => {
+const delGameFormationAdventureMatchAO = (row: any) => {
   ElMessageBox.confirm(`确定要删除吗?`, "提示", {
     confirmButtonText: "确定",
     cancelButtonText: "取消",
     type: "warning",
   })
       .then(async () => {
-        await deleteGameFormationBase(row);
+        await deleteGameFormationAdventureMatchAO(row);
         ElMessage.success("删除成功");
         handleQuery();
       })
