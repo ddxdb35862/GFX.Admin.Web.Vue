@@ -1,17 +1,20 @@
 ﻿<template>
   <div class="gameFormationAdventureMatchAO-container">
-    <my-dialog @data-updated="handleDataUpdated" />
     <el-card shadow="hover" :body-style="{ paddingBottom: '0' }">
       <el-form :model="queryParams" ref="queryForm" labelWidth="90">
         <el-row>
           <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" class="mb10">
-            <el-form-item label="轮次">
-              <el-input v-model="queryParams.roundId" clearable="" placeholder="1,2,3...,14"/>
+            <el-form-item label="模式">
+              <el-select clearable="" v-model="queryParams.adventureMode" placeholder="请选择模式">
+                <el-option v-for="(item,index) in getEnumGameAdventureModeData" :key="index" :value="item.value" :label="`${item.describe}`" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" class="mb10">
-            <el-form-item label="模式">
-              <el-input v-model="queryParams.adventureMode" clearable="" placeholder="1,2"/>
+            <el-form-item label="轮次">
+              <el-select clearable="" v-model="queryParams.roundId" placeholder="请选择轮次">
+                <el-option v-for="(item,index) in getEnumGameRoundData" :key="index" :value="item.value" :label="`${item.describe}`" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" class="mb10">
@@ -31,7 +34,7 @@
           <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" class="mb10">
             <el-form-item>
               <el-button-group>
-                <el-button type="primary" icon="ele-Plus" @click="addAdventureAO" v-auth="'gameFormationAdventureMatchAO:add'">
+                <el-button type="primary" icon="ele-Plus" @click="openAddGameFormationAdventureMatchAO()" v-auth="'gameFormationAdventureMatchAO:add'">
                   添加
                 </el-button>
               </el-button-group>
@@ -49,9 +52,18 @@
           row-key="s_Id">
         <el-table-column type="index" label="序号" width="55"/>
         <el-table-column prop="s_Id" label="Id" width="240" show-overflow-tooltip=""/>
-        <el-table-column prop="roundId" label="轮次" width="80" show-overflow-tooltip=""/>
-        <el-table-column prop="adventureMode" label="闯关模式" width="120" show-overflow-tooltip=""/>
+        <el-table-column prop="adventureMode" label="闯关模式" width="120" show-overflow-tooltip="">
+          <template #default="scope">
+              <el-tag>{{ getEnumDesc(scope.row.adventureMode, getEnumGameAdventureModeData)}}</el-tag>
+            </template>
+        </el-table-column>
+        <el-table-column prop="roundId" label="轮次" width="100" show-overflow-tooltip="">
+          <template #default="scope">
+            <el-tag>{{ getEnumDesc(scope.row.roundId, getEnumGameRoundData)}}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="adventureTime" label="闯关次数" width="100" show-overflow-tooltip=""/>
+        <el-table-column prop="s_FormationId" label="阵容ID" width="240" show-overflow-tooltip=""/>
         <el-table-column prop="formationRemark" label="阵容备注" width="240" show-overflow-tooltip=""/>
         <el-table-column prop="s_UpdateTime" label="更新时间" width="160" show-overflow-tooltip=""/>
         <el-table-column prop="remark" label="备注" width="240" show-overflow-tooltip=""/>
@@ -77,7 +89,7 @@
 </template>
 
 <script lang="ts" setup="" name="gameFormationAdventureMatchAO">
-import {ref} from "vue";
+import {ref,onMounted} from "vue";
 import {ElMessageBox, ElMessage} from "element-plus";
 import {auth} from '/@/utils/authFunction';
 import {getDictDataItem as di, getDictDataList as dl} from '/@/utils/dict-utils';
@@ -85,7 +97,11 @@ import {getDictDataItem as di, getDictDataList as dl} from '/@/utils/dict-utils'
 
 import editDialog from '/@/views/game/gameFormation/adventureMatchAO/component/editDialog.vue'
 import {listGameFormationAdventureMatchAO, deleteGameFormationAdventureMatchAO} from '/@/api/game/gameFormation/adventureMatchAO';
+import { getAPI } from '/@/utils/axios-utils';
+import { SysEnumApi } from '/@/api-services/api';
+import commonFunction from '/@/utils/commonFunction';
 
+const { getEnumDesc } = commonFunction();
 // import { defineStore } from 'pinia';  
   
 // export const useCounterStore = defineStore('counter', {  
@@ -105,7 +121,9 @@ const showAdvanceQueryUI = ref(false);
 const editDialogRef = ref();
 const loading = ref(false);
 const tableData = ref<any>([]);
-const queryParams = ref<any>({roundId:"1", adventureMode:"0", adventureTime:"1"});
+const getEnumGameAdventureModeData = ref<any>([]);
+const getEnumGameRoundData = ref<any>([]);
+var queryParams = ref<any>({roundId:1, adventureMode:0, adventureTime:1});
 const tableParams = ref({
   page: 1,
   pageSize: 10,
@@ -123,12 +141,13 @@ const changeAdvanceQueryUI = () => {
 const handleQuery = async () => {
   loading.value = true;
   var res = await listGameFormationAdventureMatchAO(Object.assign(queryParams.value, tableParams.value));
+  console.log(queryParams.value);
+  console.log("123456324");
   console.log(res.data.result);
   tableData.value = res.data.result == null ? []: res.data.result;
   //tableParams.value.total = tableData.value.count;
   loading.value = false;
 };
-
 // 打开编辑页面
 const openEditGameFormationAdventureMatchAO = (row: any) => {
   editClientChannelTitle.value = '编辑闯关匹配阵容';
@@ -138,11 +157,10 @@ const openEditGameFormationAdventureMatchAO = (row: any) => {
 };
 
 // 打开添加页面
-const openAddGameFormationAdventureMatchAO = (row: any) => {
+const openAddGameFormationAdventureMatchAO = () => {
   editClientChannelTitle.value = '添加闯关匹配阵容';
-  console.log(row)
   editDialogRef.value.isEditor= false;
-  editDialogRef.value.openDialog(row);
+  editDialogRef.value.openDialog({});
 };
 
 // 删除
@@ -173,7 +191,16 @@ const handleCurrentChange = (val: number) => {
   handleQuery();
 };
 
-handleQuery();
+
+onMounted(async () => {
+      // 这里放置组件挂载后需要执行的代码
+      getEnumGameAdventureModeData.value = (await getAPI(SysEnumApi).apiSysEnumEnumDataListGet('GameAdventureMode')).data.result ?? [];
+      getEnumGameRoundData.value = (await getAPI(SysEnumApi).apiSysEnumEnumDataListGet('GameRound')).data.result ?? [];
+      queryParams.value.adventureMode = getEnumGameAdventureModeData.value[0].value;
+      queryParams.value.roundId = getEnumGameRoundData.value[1].value;
+      handleQuery();
+      // 可以在这里访问DOM元素、初始化外部库、发送网络请求等
+    });
 
 </script>
 <style scoped>

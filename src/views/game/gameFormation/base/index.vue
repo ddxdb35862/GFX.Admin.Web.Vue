@@ -1,17 +1,20 @@
 ﻿<template>
   <div class="gameFormationBase-container">
-    <my-dialog @data-updated="handleDataUpdated" />
     <el-card shadow="hover" :body-style="{ paddingBottom: '0' }">
       <el-form :model="queryParams" ref="queryForm" labelWidth="90">
         <el-row>
           <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" class="mb10">
             <el-form-item label="轮次">
-              <el-input v-model="queryParams.roundId" clearable="" placeholder="1,2,3...,14"/>
+              <el-select clearable="" v-model="queryParams.roundId" placeholder="请选择轮次">
+                <el-option v-for="(item,index) in getEnumGameRoundData" :key="index" :value="item.value" :label="`${item.describe}`" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" class="mb10">
             <el-form-item label="玩家等级">
-              <el-input v-model="queryParams.rank" clearable="" placeholder="1,2,3...,25"/>
+              <el-select clearable="" v-model="queryParams.rank" placeholder="请选择模式">
+                <el-option v-for="(item,index) in getEnumGameRankData" :key="index" :value="item.value" :label="`${item.describe}`" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :xs="24" :sm="12" :md="12" :lg="4" :xl="4" class="mb10">
@@ -61,8 +64,16 @@
           row-key="s_Id">
         <el-table-column type="index" label="序号" width="55"/>
         <el-table-column prop="s_Id" label="Id" width="240" show-overflow-tooltip=""/>
-        <el-table-column prop="roundId" label="轮次" width="80" show-overflow-tooltip=""/>
-        <el-table-column prop="playerRank" label="玩家等级" width="120" show-overflow-tooltip=""/>
+        <el-table-column prop="roundId" label="轮次" width="100" show-overflow-tooltip="">
+          <template #default="scope">
+            <el-tag>{{ getEnumDesc(scope.row.roundId, getEnumGameRoundData)}}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="playerRank" label="玩家等级" width="120" show-overflow-tooltip="">
+          <template #default="scope">
+            <el-tag>{{ getEnumDesc(scope.row.playerRank, getEnumGameRankData)}}</el-tag>
+          </template>
+        </el-table-column>
         <el-table-column prop="playerCareerConfigId" label="职业Id" width="100" show-overflow-tooltip=""/>
         <el-table-column prop="playerCareerSkinConfigId" label="皮肤Id" width="100" show-overflow-tooltip=""/>
         <el-table-column prop="s_UpdateTime" label="更新时间" width="160" show-overflow-tooltip=""/>
@@ -89,7 +100,7 @@
 </template>
 
 <script lang="ts" setup="" name="gameFormationBase">
-import {ref} from "vue";
+import {ref,onMounted} from "vue";
 import {ElMessageBox, ElMessage} from "element-plus";
 import {auth} from '/@/utils/authFunction';
 import {getDictDataItem as di, getDictDataList as dl} from '/@/utils/dict-utils';
@@ -97,27 +108,19 @@ import {getDictDataItem as di, getDictDataList as dl} from '/@/utils/dict-utils'
 
 import editDialog from '/@/views/game/gameFormation/base/component/editDialog.vue'
 import {listGameFormationBase, deleteGameFormationBase, mergeOnlineGameFormationBase} from '/@/api/game/gameFormation/base';
+import { getAPI } from '/@/utils/axios-utils';
+import { SysEnumApi } from '/@/api-services/api';
+import commonFunction from '/@/utils/commonFunction';
 
-// import { defineStore } from 'pinia';  
-  
-// export const useCounterStore = defineStore('counter', {  
-//   state: () => ({  
-//     count: 0,  
-//   }),  
-//   actions: {  
-//     increment() {  
-//       this.count++;  
-//       console.log(this.count);
-//     },  
-//   },  
-// });
-
+const { getEnumDesc } = commonFunction();
 
 const showAdvanceQueryUI = ref(false);
 const editDialogRef = ref();
 const loading = ref(false);
 const tableData = ref<any>([]);
-const queryParams = ref<any>({toMergePlayerUnitIds: '2276326310345244672', roundId:"1", rank:"0"});
+const getEnumGameRankData = ref<any>([]);
+const getEnumGameRoundData = ref<any>([]);
+var queryParams = ref<any>({toMergePlayerUnitIds: '2276326310345244672', roundId:1, rank:0, careerConfigId:1, careerSkinConfigId:0});
 const tableParams = ref({
   page: 1,
   pageSize: 10,
@@ -194,8 +197,16 @@ const handleCurrentChange = (val: number) => {
   handleQuery();
 };
 
-handleQuery();
 
+onMounted(async () => {
+      // 这里放置组件挂载后需要执行的代码
+      getEnumGameRankData.value = (await getAPI(SysEnumApi).apiSysEnumEnumDataListGet('GameRank')).data.result ?? [];
+      getEnumGameRoundData.value = (await getAPI(SysEnumApi).apiSysEnumEnumDataListGet('GameRound')).data.result ?? [];
+      queryParams.value.rank = getEnumGameRankData.value[0].value;
+      queryParams.value.roundId = getEnumGameRoundData.value[1].value;
+      handleQuery();
+      // 可以在这里访问DOM元素、初始化外部库、发送网络请求等
+    });
 </script>
 <style scoped>
 :deep(.el-ipnut),

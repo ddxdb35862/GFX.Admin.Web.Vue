@@ -6,6 +6,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "vite --port 8891",
+    "test": "vite --port 8891",
+    "production": "vite --port 8891",
     "build": "vite build",
     "lint-fix": "eslint --fix --ext .js --ext .jsx --ext .vue src/"
   },

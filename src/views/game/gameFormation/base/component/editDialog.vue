@@ -2,7 +2,6 @@
 	<div class="gameFormationBase-container">
 		<el-dialog v-model="isShowDialog" draggable="" 
 					v-loading="loading" width="90%">
-			
 			<template #header>
 				<div style="color: #fff">
 					<span>{{ props.title }}</span>
