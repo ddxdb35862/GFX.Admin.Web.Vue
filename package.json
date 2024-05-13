@@ -5,9 +5,9 @@
   "author": "AlianBlank <https://github.com/AlianBlank>",
   "license": "MIT",
   "scripts": {
-    "dev": "vite --port 8891",
-    "test": "vite --port 8891",
-    "production": "vite --port 8891",
+    "dev": "vite --mode dev --port 8891",
+    "test": "vite --mode test --port 8891",
+    "production": "vite --mode production --port 8891",
     "build": "vite build",
     "lint-fix": "eslint --fix --ext .js --ext .jsx --ext .vue src/"
   },
